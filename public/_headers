@@ -1,0 +1,41 @@
+# Global headers for enhanced crawler and bot access
+/*
+  X-Robots-Tag: index, follow, all
+  X-Bot-Access: unrestricted
+  X-Crawl-Permission: allow
+  X-Content-Access: public
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: *
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+
+# Specific headers for SEO files
+/robots.txt
+  Content-Type: text/plain
+  Cache-Control: public, max-age=86400
+
+/sitemap.xml
+  Content-Type: application/xml
+  Cache-Control: public, max-age=86400
+
+# Static assets caching and access
+/images/*
+  Cache-Control: public, max-age=31536000
+  Access-Control-Allow-Origin: *
+
+/assets/*
+  Cache-Control: public, max-age=31536000
+  Access-Control-Allow-Origin: *
+
+# Main application files
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Robots-Tag: index, follow, all
+
+# Security headers for API endpoints
+/api/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: *

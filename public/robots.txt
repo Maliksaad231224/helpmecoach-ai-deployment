@@ -1,0 +1,60 @@
+# Robots.txt for CoachAI Platform
+# This file allows all web crawlers and research agents to access the site
+
+User-agent: *
+Allow: /
+
+# Explicitly allow major search engines and AI research agents
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# Allow all research and academic crawlers
+User-agent: ia_archiver
+Allow: /
+
+User-agent: Wayback
+Allow: /
+
+User-agent: archive.org_bot
+Allow: /
+
+# No crawl delay - allow immediate access
+Crawl-delay: 0
+
+# Sitemap location (will be available once generated)
+Sitemap: https://coachai-platform.netlify.app/sitemap.xml
+
+# Additional directives for maximum accessibility
+# No robots meta tag restrictions
+# No rate limiting
+# Full content access enabled

@@ -1,0 +1,12 @@
+# Security Policy for CoachAI Platform
+# This file provides security contact information and policies
+
+Contact: security@coachai-platform.netlify.app
+Expires: 2026-01-01T00:00:00.000Z
+Encryption: https://coachai-platform.netlify.app/pgp-key.txt
+Acknowledgments: https://coachai-platform.netlify.app/security-acknowledgments
+Policy: https://coachai-platform.netlify.app/security-policy
+Hiring: https://coachai-platform.netlify.app/careers
+
+# We welcome responsible disclosure of security vulnerabilities
+# Please report security issues through the contact information above

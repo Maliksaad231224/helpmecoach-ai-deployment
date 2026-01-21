@@ -5,7 +5,8 @@ import { Send, MessageCircle, Mail, Phone, MapPin, Clock, CheckCircle, AlertCirc
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
-import { supabase } from '../lib/supabase'
+import { db } from '../lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 interface FormData {
   name: string
@@ -51,27 +52,18 @@ export const ContactPage: React.FC = () => {
     setStatus({ type: 'loading', message: 'Submitting your inquiry...' })
 
     try {
-      // Insert into Supabase
-      const { data, error } = await supabase
-        .from('contact_inquiries')
-        .insert([
-          {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone || null,
-            company: formData.company || null,
-            subject: formData.subject,
-            message: formData.message,
-            inquiry_type: formData.inquiryType,
-            created_at: new Date().toISOString(),
-            status: 'new'
-          }
-        ])
-        .select()
-
-      if (error) {
-        throw error
-      }
+      // Insert into Firebase
+      await addDoc(collection(db, 'contact_inquiries'), {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        company: formData.company || null,
+        subject: formData.subject,
+        message: formData.message,
+        inquiryType: formData.inquiryType,
+        createdAt: serverTimestamp(),
+        status: 'new'
+      })
 
       setStatus({ 
         type: 'success', 

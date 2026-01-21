@@ -11,7 +11,7 @@ interface StripeProviderProps {
   currency: string
   sponsorshipTier: string
   customerEmail: string
-  sponsorId: number
+  sponsorId: string | null
   onPaymentSuccess: (paymentIntent: any) => void
   onPaymentError: (error: string) => void
 }

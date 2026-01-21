@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X, User, Mail, Phone, MapPin, Calendar, GraduationCap, Target } from 'lucide-react'
 import { Button } from '../ui/button'
-import { supabase } from '../../lib/supabase'
+import { db } from '../../lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 interface CamperOnboardingModalProps {
   isOpen: boolean
@@ -102,17 +103,18 @@ export const CamperOnboardingModal: React.FC<CamperOnboardingModalProps> = ({
 
     setIsSubmitting(true)
     try {
-      const { data, error } = await supabase.functions.invoke('camper-application-submit', {
-        body: formData
+      await addDoc(collection(db, 'camper_applications'), {
+        ...formData,
+        submittedAt: serverTimestamp(),
+        status: 'pending'
       })
 
-      if (error) throw error
-
-      setSubmitMessage(data?.data?.message || 'Application submitted successfully!')
+      setSubmitMessage('Application submitted successfully! Please check your email for confirmation.')
       setCurrentStep(5) // Success step
       
       // Auto-close modal after showing success for 4 seconds
       setTimeout(() => {
+        window.open('https://marketplace.campdefi.app', '_blank')
         onClose()
       }, 4000)
     } catch (error: any) {

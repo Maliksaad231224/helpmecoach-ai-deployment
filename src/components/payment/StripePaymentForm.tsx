@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
 import { Button } from '../ui/button'
-import { supabase } from '../../lib/supabase'
+// Firebase functions will be called via HTTP
 import { CreditCard, Loader2 } from 'lucide-react'
 
 interface StripePaymentFormProps {
@@ -9,7 +9,7 @@ interface StripePaymentFormProps {
   currency: string
   sponsorshipTier: string
   customerEmail: string
-  sponsorId: number
+  sponsorId: string | null
   onPaymentSuccess: (paymentIntent: any) => void
   onPaymentError: (error: string) => void
 }
@@ -46,22 +46,26 @@ export const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     setPaymentError(null)
 
     try {
-      // Create payment intent
-      const { data: intentData, error: intentError } = await supabase.functions.invoke('sponsor-payment-intent', {
-        body: {
+      // Create payment intent via Firebase Cloud Function
+      const response = await fetch(`${import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || ''}/sponsorPaymentIntent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           amount,
           currency,
           sponsorshipTier,
           customerEmail,
           sponsorId
-        }
+        })
       })
 
-      if (intentError) {
-        throw new Error(intentError.message)
+      const intentData = await response.json()
+
+      if (!response.ok) {
+        throw new Error(intentData.error || 'Failed to create payment intent')
       }
 
-      const clientSecret = intentData?.data?.clientSecret
+      const clientSecret = intentData?.clientSecret
       if (!clientSecret) {
         throw new Error('Failed to create payment intent')
       }

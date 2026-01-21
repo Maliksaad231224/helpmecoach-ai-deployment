@@ -24,10 +24,12 @@ import {
   Monitor
 } from 'lucide-react'
 import { Button } from '../components/ui/button'
-import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
+import { db } from '../lib/firebase'
+import { collection, query, where, getDocs } from 'firebase/firestore'
 
 export const CAMPAlphaPage: React.FC = () => {
-  const [user, setUser] = useState<any>(null)
+  const { user } = useAuth()
   const [subscription, setSubscription] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
@@ -35,32 +37,22 @@ export const CAMPAlphaPage: React.FC = () => {
     if (!user) return
 
     try {
-      const { data } = await supabase
-        .from('camp_alpha_subscriptions')
-        .select(`
-          *,
-          camp_alpha_plans!price_id(
-            plan_type,
-            price,
-            monthly_limit
-          )
-        `)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle()
-
-      setSubscription(data)
+      const q = query(
+        collection(db, 'camp_alpha_subscriptions'),
+        where('userId', '==', user.uid),
+        where('status', '==', 'active')
+      )
+      const querySnapshot = await getDocs(q)
+      if (!querySnapshot.empty) {
+        setSubscription(querySnapshot.docs[0].data())
+      }
     } catch (error) {
       console.error('Failed to fetch subscription:', error)
     }
   }
 
   useEffect(() => {
-    // Get current user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      if (user) fetchSubscription()
-    })
+    if (user) fetchSubscription()
 
     // Handle payment result
     const urlParams = new URLSearchParams(window.location.search)
@@ -74,7 +66,7 @@ export const CAMPAlphaPage: React.FC = () => {
     } else if (subscriptionStatus === 'cancelled') {
       window.history.replaceState({}, document.title, window.location.pathname)
     }
-  }, [])
+  }, [user])
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -85,17 +77,21 @@ export const CAMPAlphaPage: React.FC = () => {
     setLoading(true)
 
     try {
-      const { data, error } = await supabase.functions.invoke('create-subscription', {
-        body: {
+      // Call Firebase Cloud Function for subscription
+      const response = await fetch(`${import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || ''}/createSubscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           planType: 'alpha',
-          customerEmail: user.email
-        }
+          customerEmail: user.email,
+          userId: user.uid
+        })
       })
 
-      if (error) throw error
+      const data = await response.json()
 
-      if (data.data?.checkoutUrl) {
-        window.location.href = data.data.checkoutUrl
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl
       }
     } catch (error: any) {
       console.error('Subscription error:', error)

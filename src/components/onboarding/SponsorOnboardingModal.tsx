@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 import { X, Building, CreditCard, Wallet, CheckCircle } from 'lucide-react'
 import { Button } from '../ui/button'
 import { StripeProvider } from '../payment/StripeProvider'
-import { supabase } from '../../lib/supabase'
+import { db } from '../../lib/firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 interface SponsorOnboardingModalProps {
   isOpen: boolean
@@ -17,7 +18,7 @@ export const SponsorOnboardingModal: React.FC<SponsorOnboardingModalProps> = ({
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
-  const [profileId, setProfileId] = useState<number | null>(null)
+  const [profileId, setProfileId] = useState<string | null>(null)
   const [showPayment, setShowPayment] = useState(false)
   const [paymentCompleted, setPaymentCompleted] = useState(false)
   const [formData, setFormData] = useState({
@@ -146,25 +147,23 @@ export const SponsorOnboardingModal: React.FC<SponsorOnboardingModalProps> = ({
 
     setIsSubmitting(true)
     try {
-      const { data, error } = await supabase.functions.invoke('sponsor-profile-create', {
-        body: {
-          organizationName: formData.organizationName,
-          individualName: formData.individualName,
-          contactEmail: formData.contactEmail,
-          contactPhone: formData.contactPhone,
-          businessFocusAreas: formData.businessFocusAreas,
-          preferredCamperSpecializations: formData.preferredCamperSpecializations,
-          sponsorshipTier: formData.sponsorshipTier,
-          paymentMethod: formData.paymentMethod,
-          walletAddress: formData.walletAddress,
-          termsAccepted: formData.termsAccepted
-        }
+      const docRef = await addDoc(collection(db, 'sponsor_profiles'), {
+        organizationName: formData.organizationName,
+        individualName: formData.individualName,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone,
+        businessFocusAreas: formData.businessFocusAreas,
+        preferredCamperSpecializations: formData.preferredCamperSpecializations,
+        sponsorshipTier: formData.sponsorshipTier,
+        paymentMethod: formData.paymentMethod,
+        walletAddress: formData.walletAddress,
+        termsAccepted: formData.termsAccepted,
+        submittedAt: serverTimestamp(),
+        status: 'pending'
       })
 
-      if (error) throw error
-
-      setProfileId(data?.data?.profileId)
-      setSubmitMessage(data?.data?.message || 'Profile created successfully!')
+      setProfileId(docRef.id)
+      setSubmitMessage('Profile created successfully!')
       
       // If payment method is Stripe, show payment form
       if (formData.paymentMethod === 'stripe') {

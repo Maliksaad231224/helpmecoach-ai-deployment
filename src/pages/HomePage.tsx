@@ -88,6 +88,39 @@ export const HomePage: React.FC = () => {
             >
               <TiledImages />
             </motion.div>
+
+            {/* Donation Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mb-16 text-center"
+            >
+              <div className="bg-navy-deep/80 border border-accent-blue/30 rounded-xl p-8 max-w-2xl mx-auto">
+                <h3 className="text-2xl font-heading font-bold text-white mb-4">
+                  Support Our Mission
+                </h3>
+                <p className="text-text-secondary mb-6">
+                  CoachAI honors all donations with a 100% donation receipt and tax credit. If you wish to support, click below:
+                </p>
+                <Button 
+                  className="bg-accent-blue hover:bg-accent-blue/90 text-white text-lg px-8 py-4 mb-6"
+                  onClick={() => window.open('https://donorbox.org/technology-sales-bootcamps-for-ex-offenders', '_blank')}
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Donate Now
+                </Button>
+                <p className="text-text-secondary mb-4">
+                  If you wish to be a founder in the Tech revolution, click below:
+                </p>
+                <Link to="/founders-club">
+                  <Button className="bg-navy-deep text-white hover:bg-navy-light border border-accent-blue/30 hover:border-accent-blue/60 text-lg px-8 py-4 transition-all duration-200">
+                    Join Founders Club
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </section>
 

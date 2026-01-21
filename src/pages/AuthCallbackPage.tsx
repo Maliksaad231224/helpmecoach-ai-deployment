@@ -1,46 +1,24 @@
 import React, { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 export const AuthCallbackPage: React.FC = () => {
   const navigate = useNavigate()
+  const { user, loading } = useAuth()
 
   useEffect(() => {
-    handleAuthCallback()
-  }, [])
-
-  async function handleAuthCallback() {
-    try {
-      // Get the hash fragment from the URL
-      const hashFragment = window.location.hash
-
-      if (hashFragment && hashFragment.length > 0) {
-        // Exchange the auth code for a session
-        const { data, error } = await supabase.auth.exchangeCodeForSession(hashFragment)
-
-        if (error) {
-          console.error('Error exchanging code for session:', error.message)
-          // Redirect to home with error
-          navigate('/?error=' + encodeURIComponent(error.message))
-          return
-        }
-
-        if (data.session) {
-          // Successfully signed in, redirect to home
-          navigate('/')
-          return
-        }
+    if (!loading) {
+      if (user) {
+        // User is authenticated, redirect to home
+        navigate('/')
+      } else {
+        // No user found, redirect to home with error
+        navigate('/?error=Authentication+failed')
       }
-
-      // If we get here, something went wrong
-      navigate('/?error=No session found')
-    } catch (error: any) {
-      console.error('Auth callback error:', error)
-      navigate('/?error=' + encodeURIComponent(error.message || 'Authentication failed'))
     }
-  }
+  }, [user, loading, navigate])
 
   return (
     <div className="min-h-screen bg-navy-gradient flex items-center justify-center">

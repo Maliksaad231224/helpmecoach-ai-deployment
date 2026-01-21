@@ -1,6 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
-import type { User, Session } from '@supabase/supabase-js'
+import { auth, googleProvider } from '../lib/firebase'
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User,
+  sendEmailVerification
+} from 'firebase/auth'
 
 interface AuthContextType {
   user: User | null
@@ -17,57 +25,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // Load user on mount (one-time check)
   useEffect(() => {
-    async function loadUser() {
-      setLoading(true)
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        setUser(user)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadUser()
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user)
+      setLoading(false)
+    })
 
-    // Set up auth listener - KEEP SIMPLE, avoid any async operations in callback
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        // NEVER use any async operations in callback
-        setUser(session?.user || null)
-        setLoading(false)
-      }
-    )
-
-    return () => subscription.unsubscribe()
+    return () => unsubscribe()
   }, [])
 
-  // Auth methods
   async function signIn(email: string, password: string) {
-    return await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password)
+      return { data: result, error: null }
+    } catch (error: any) {
+      return { data: null, error: { message: error.message } }
+    }
   }
 
   async function signUp(email: string, password: string) {
-    return await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.protocol}//${window.location.host}/auth/callback`
+    try {
+      const result = await createUserWithEmailAndPassword(auth, email, password)
+      if (result.user) {
+        await sendEmailVerification(result.user)
       }
-    })
+      return { data: result, error: null }
+    } catch (error: any) {
+      return { data: null, error: { message: error.message } }
+    }
   }
 
   async function signInWithGoogle() {
-    return await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.protocol}//${window.location.host}/auth/callback`
-      }
-    })
+    try {
+      const result = await signInWithPopup(auth, googleProvider)
+      return { data: result, error: null }
+    } catch (error: any) {
+      return { data: null, error: { message: error.message } }
+    }
   }
 
   async function signOut() {
-    return await supabase.auth.signOut()
+    try {
+      await firebaseSignOut(auth)
+      return { error: null }
+    } catch (error: any) {
+      return { error: { message: error.message } }
+    }
   }
 
   const value = {

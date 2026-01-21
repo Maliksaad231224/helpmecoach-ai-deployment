@@ -85,7 +85,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-navy-deep border border-navy-light/50 rounded-xl p-8 w-full max-w-md relative"
+        className="bg-navy-deep border border-navy-light/50 rounded-xl p-8 w-full max-w-md relative max-h-[90vh] overflow-y-auto"
       >
         <button
           onClick={onClose}

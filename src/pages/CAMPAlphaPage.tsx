@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { OpenAISidebar } from '../components/OpenAISidebar'
-import { 
-  Zap, 
-  Code, 
-  Palette, 
-  Rocket, 
-  TrendingUp, 
-  Mail, 
-  ShoppingCart, 
-  Settings, 
-  Target, 
-  Brain, 
-  ArrowRight, 
+import {
+  Zap,
+  Code,
+  Palette,
+  Rocket,
+  TrendingUp,
+  Mail,
+  ShoppingCart,
+  Settings,
+  Target,
+  Brain,
+  ArrowRight,
   Clock,
   Sparkles,
   Bot,
@@ -33,7 +33,7 @@ export const CAMPAlphaPage: React.FC = () => {
   const [subscription, setSubscription] = useState<any>(null)
   const [loading, setLoading] = useState(false)
 
-  const fetchSubscription = async () => {
+  const fetchSubscription = useCallback(async () => {
     if (!user) return
 
     try {
@@ -49,7 +49,7 @@ export const CAMPAlphaPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch subscription:', error)
     }
-  }
+  }, [user])
 
   useEffect(() => {
     if (user) fetchSubscription()
@@ -66,7 +66,7 @@ export const CAMPAlphaPage: React.FC = () => {
     } else if (subscriptionStatus === 'cancelled') {
       window.history.replaceState({}, document.title, window.location.pathname)
     }
-  }, [user])
+  }, [user, fetchSubscription])
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -213,7 +213,7 @@ export const CAMPAlphaPage: React.FC = () => {
               </div>
               <div className="w-32 h-1 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 rounded-full mx-auto mb-6"></div>
             </motion.div>
-            
+
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -222,7 +222,7 @@ export const CAMPAlphaPage: React.FC = () => {
             >
               AI-driven suite of application design, development and launch tools including marketing, sales, SEO and content management automation.
             </motion.p>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -234,7 +234,7 @@ export const CAMPAlphaPage: React.FC = () => {
                 <span className="text-blue-500 font-semibold text-xl">AI-POWERED BUSINESS TRANSFORMATION LAUNCHPAD</span>
               </div>
               <p className="text-text-primary text-center leading-relaxed text-lg">
-                Transform your ideas into fully functional applications instantly. From design to deployment, 
+                Transform your ideas into fully functional applications instantly. From design to deployment,
                 Alpha handles everything so you can focus on building the future.
               </p>
             </motion.div>
@@ -425,11 +425,11 @@ export const CAMPAlphaPage: React.FC = () => {
               <p className="text-xl text-text-secondary mb-12">
                 Transform your ideas into reality with our AI-powered development suite.
               </p>
-              
+
               {/* Pricing Card */}
               <div className="max-w-md mx-auto">
                 <div className="bg-blue-500/10 border-2 border-blue-500 rounded-2xl p-8 relative overflow-hidden">
-                  
+
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-heading font-bold text-text-primary mb-2">
                       CAMP Alpha Suite
@@ -442,7 +442,7 @@ export const CAMPAlphaPage: React.FC = () => {
                       Complete AI-driven development toolkit
                     </p>
                   </div>
-                  
+
                   {/* Features */}
                   <div className="space-y-4 mb-8">
                     <div className="flex items-center text-left">
@@ -474,7 +474,7 @@ export const CAMPAlphaPage: React.FC = () => {
                       <span className="text-text-primary">24/7 Support & Updates</span>
                     </div>
                   </div>
-                  
+
                   {/* CTA Button */}
                   {subscription ? (
                     <div className="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
@@ -499,7 +499,7 @@ export const CAMPAlphaPage: React.FC = () => {
                       )}
                     </Button>
                   )}
-                  
+
                   {!user && (
                     <p className="text-text-secondary text-sm">
                       Please sign in to start your subscription
@@ -507,7 +507,7 @@ export const CAMPAlphaPage: React.FC = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="bg-blue-500/20 border border-blue-500 rounded-lg p-6 mt-8">
                 <p className="text-blue-500 font-bold text-lg">
                   🚀 Get instant access to the complete Alpha development suite and start building the future today.

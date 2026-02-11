@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Target, Building, ShoppingCart, Shield, Menu } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const OpenAISidebar: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   // Get current path for highlighting active item
   const getCurrentActiveItem = () => {
@@ -140,7 +141,7 @@ export const OpenAISidebar: React.FC = () => {
                         } border rounded-lg p-4 hover:bg-navy-deep/90 hover:border-accent-blue/40 transition-all duration-200 cursor-pointer group`}
                         onClick={() => {
                           if (item.href) {
-                            window.location.href = item.href
+                            navigate(item.href)
                             setIsMobileOpen(false)
                           }
                         }}
@@ -267,7 +268,7 @@ export const OpenAISidebar: React.FC = () => {
                         className={`${isActive ? 'bg-accent-blue/20 border-accent-blue shadow-lg shadow-accent-blue/20' : 'bg-navy-deep/80 border-navy-light/30'} border-2 rounded-xl p-6 hover:bg-navy-deep/90 hover:border-accent-blue/40 hover:shadow-lg hover:shadow-accent-blue/10 hover:scale-[1.02] transition-all duration-300 cursor-pointer group`}
                         onClick={() => {
                           if (item.href) {
-                            window.location.href = item.href
+                            navigate(item.href)
                           }
                         }}
                       >
@@ -316,7 +317,7 @@ export const OpenAISidebar: React.FC = () => {
                         className={`w-16 h-16 ${isActive ? 'bg-accent-blue/30 border-accent-blue shadow-lg shadow-accent-blue/20' : `${item.bgColor} border-navy-light/30`} border-2 rounded-xl flex items-center justify-center hover:bg-navy-deep/80 hover:border-accent-blue/40 hover:shadow-lg hover:shadow-accent-blue/10 hover:scale-105 transition-all duration-300 cursor-pointer group relative ml-1`}
                         onClick={() => {
                           if (item.href) {
-                            window.location.href = item.href
+                            navigate(item.href)
                           }
                         }}
                       >
